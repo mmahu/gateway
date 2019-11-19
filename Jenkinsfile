@@ -12,11 +12,18 @@ pipeline {
                 sh './gradlew clean assemble'
             }
         }
+        stage('Maven Install') {
+          agent {
+            docker {
+              image 'maven:3.5.0'
+            }
+          }
+          steps {
+            sh 'mvn clean install'
+          }
         stage('imaging') {
             steps {
-                script {
-                    docker.build Dockerfile
-                }
+                sh 'docker build -t Dockerfile'
             }
         }
     }
