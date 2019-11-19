@@ -14,7 +14,9 @@ pipeline {
         }
         stage('imaging') {
             steps {
-                sh 'docker build -t Dockerfile'
+                script {
+                    docker.build Dockerfile
+                }
             }
         }
     }
