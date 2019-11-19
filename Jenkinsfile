@@ -26,5 +26,10 @@ pipeline {
                 sh 'docker build -t Dockerfile'
             }
         }
+        stage('deploy') {
+            steps {
+                sh 'docker run --name="mmahu-gateway" -p 8181:8080 gateway'
+            }
+        }
     }
 }
