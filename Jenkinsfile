@@ -9,7 +9,12 @@ pipeline {
         stage('build') {
             steps {
                 sh 'chmod +x gradlew'
-                sh './gradlew clean build'
+                sh './gradlew clean assemble'
+            }
+        }
+        stage('imaging') {
+            steps {
+                sh './docker build -t Dockerfile'
             }
         }
     }
