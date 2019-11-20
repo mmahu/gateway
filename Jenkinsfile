@@ -12,23 +12,14 @@ pipeline {
                 sh './gradlew clean assemble'
             }
         }
-        stage('Maven Install') {
-          agent {
-            docker {
-              image 'maven:3.5.0'
-            }
-          }
-          steps {
-            sh 'mvn clean install'
-          }
         stage('imaging') {
             steps {
-                sh 'docker build -t Dockerfile'
+                sh 'docker build -t mmahu-gateway:lates .'
             }
         }
         stage('deploy') {
             steps {
-                sh 'docker run --name="mmahu-gateway" -p 8181:8080 gateway'
+                sh 'docker run --name="mmahu-gateway" -p 8001:8080 mmahu-gateway:lates'
             }
         }
     }
