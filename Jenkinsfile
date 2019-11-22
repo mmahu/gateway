@@ -20,7 +20,7 @@ pipeline {
         }
         stage('deploy') {
             steps {
-                sh 'docker service create --no-resolve-image --replicas 2 --name mmahu-gateway -p 8888:8888 mmahu-main:5000/mmahu-gateway:1.0.$BUILD_NUMBER'
+                sh 'docker service create --no-resolve-image --replicas 1 --name mmahu-gateway -p 8001:8001 mmahu-main:5000/mmahu-gateway:1.0.$BUILD_NUMBER'
             }
         }
     }
