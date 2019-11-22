@@ -3,4 +3,4 @@ spring:
     name: mmahu-gateway
   cloud:
     config:
-      uri: http://mmahu-admin:8888
+      uri: http://mmahu-main:8888
