@@ -4,9 +4,9 @@
 	id 'java'
 }
 
-group = 'com.mmahu'
-version = '0.0.1'
-sourceCompatibility = '8'
+group = "${projectGroup}"
+version = "${currentVersion}${buildNumber}"
+sourceCompatibility = '1.8'
 
 repositories {
 	mavenCentral()
@@ -21,7 +21,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+	implementation 'org.springframework.cloud:spring-cloud-config-client'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}

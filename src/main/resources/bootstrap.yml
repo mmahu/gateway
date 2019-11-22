@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: mmahu-gateway
+  cloud:
+    config:
+      uri: http://mmahu-admin:8888
