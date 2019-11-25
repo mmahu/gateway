@@ -3,4 +3,4 @@ spring:
     name: mmahu-gateway
   cloud:
     config:
-      uri: http://mmahu-config:8001
+      uri: http://localhost:8001
