@@ -1,6 +1,6 @@
 spring:
   application:
-    name: mmahu-gateway
+    name: e-gateway
   cloud:
     config:
-      uri: http://localhost:8001
+      uri: http://master:9001
