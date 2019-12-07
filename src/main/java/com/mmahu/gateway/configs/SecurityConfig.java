@@ -2,6 +2,7 @@ package com.mmahu.gateway.configs;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.mmahu.gateway.dto.JwtDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -64,6 +65,7 @@ public class SecurityConfig {
 
     private String toJson(JwtDto dto) {
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
         try {
             return mapper.writeValueAsString(dto);
         } catch (JsonProcessingException e) {
