@@ -11,12 +11,20 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.jwt.Jwt;
 import org.springframework.security.jwt.JwtHelper;
+import org.springframework.security.jwt.crypto.sign.MacSigner;
 import org.springframework.security.jwt.crypto.sign.RsaSigner;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
+import reactor.core.publisher.Mono;
 
 import java.security.Principal;
 
 import static org.springframework.security.config.Customizer.withDefaults;
+import static org.springframework.security.config.web.server.SecurityWebFiltersOrder.AUTHENTICATION;
+import static org.springframework.security.config.web.server.SecurityWebFiltersOrder.AUTHORIZATION;
 
 @Configuration
 @EnableWebFluxSecurity
@@ -36,8 +44,8 @@ public class SecurityConfig {
     }
 
     private String toToken(String userId) {
-        Jwt encode = JwtHelper.encode(userId, new RsaSigner(key));
-        return encode.getEncoded();
+        String token = JwtHelper.encode("{\"sub\": \"" + userId +  "\"}", new MacSigner(key)).getEncoded();
+        return "Bearer " + token;
     }
 
     @Bean
@@ -50,12 +58,25 @@ public class SecurityConfig {
         return new MapReactiveUserDetailsService(user);
     }
 
-    @Bean
-    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
-        http.authorizeExchange(exchanges -> exchanges.anyExchange().authenticated())
-                .httpBasic(withDefaults())
-                .formLogin(withDefaults());
-        return http.build();
-    }
+//    @Bean
+//    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
+//        http.authorizeExchange(exchanges -> exchanges.anyExchange().authenticated())
+//                .httpBasic(withDefaults())
+//                .formLogin(withDefaults());
+//        return http
+//                .addFilterAfter(new WebFilter(){
+//                    @Override
+//                    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+//                        exchange.getPrincipal()
+//                                .map(Principal::getName)
+//                                .map(userName -> {
+//                                    exchange.getRequest().mutate().header("Authorization", toToken(userName)).build();
+//                                    return exchange;
+//                                }).flatMap(chain::filter);
+//                        return chain.filter(exchange);
+//                    }
+//                }, AUTHORIZATION)
+//                .build();
+//    }
 
 }
