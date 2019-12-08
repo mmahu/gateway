@@ -1,4 +1,4 @@
-package com.mmahu.gateway.dto;
+package com.mmahu.gateway.configs;
 
 import java.time.Instant;
 

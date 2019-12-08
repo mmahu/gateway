@@ -3,7 +3,6 @@ package com.mmahu.gateway.configs;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.mmahu.gateway.dto.JwtDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.jwt.JwtHelper;
 import org.springframework.security.jwt.crypto.sign.MacSigner;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.web.server.ServerWebExchange;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -37,11 +37,31 @@ public class SecurityConfig {
         return (exchange, chain) -> exchange.getPrincipal()
                 .filter(UsernamePasswordAuthenticationToken.class::isInstance)
                 .map(UsernamePasswordAuthenticationToken.class::cast)
-                .map(principal -> {
-                    String token = convert(principal);
-                    exchange.getRequest().mutate().header("Authorization", token).build();
-                    return exchange;
-                }).flatMap(chain::filter);
+                .map(principal -> tokeAware(exchange, principal)).flatMap(chain::filter);
+    }
+
+    @Bean
+    public MapReactiveUserDetailsService userDetailsService() {
+        UserDetails user = User.withDefaultPasswordEncoder()
+                .username("seller")
+                .password("seller")
+                .roles("SELLER")
+                .build();
+        return new MapReactiveUserDetailsService(user);
+    }
+
+    @Bean
+    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
+        http.authorizeExchange(exchanges -> exchanges.anyExchange().authenticated())
+                .httpBasic(withDefaults())
+                .formLogin(withDefaults());
+        return http.build();
+    }
+
+    private ServerWebExchange tokeAware(ServerWebExchange exchange, UsernamePasswordAuthenticationToken principal) {
+        String token = convert(principal);
+        exchange.getRequest().mutate().header("Authorization", token).build();
+        return exchange;
     }
 
     private String convert(UsernamePasswordAuthenticationToken principal) {
@@ -71,24 +91,6 @@ public class SecurityConfig {
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Cannot convert JwtDto to Json");
         }
-    }
-
-    @Bean
-    public MapReactiveUserDetailsService userDetailsService() {
-        UserDetails user = User.withDefaultPasswordEncoder()
-                .username("seller")
-                .password("seller")
-                .roles("SELLER")
-                .build();
-        return new MapReactiveUserDetailsService(user);
-    }
-
-    @Bean
-    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
-        http.authorizeExchange(exchanges -> exchanges.anyExchange().authenticated())
-                .httpBasic(withDefaults())
-                .formLogin(withDefaults());
-        return http.build();
     }
 
 }
