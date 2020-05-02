@@ -11,7 +11,7 @@ pipeline {
                 script {
                     name = "e-gateway"
                     port = "9090:9090"
-                    registry = "master:5000"
+                    registry = "192.168.0.19:5000"
                     buildNumber = "1.0.$BUILD_NUMBER"
                 }
             }
@@ -25,12 +25,12 @@ pipeline {
             steps {
                 sh 'chmod +x gradlew'
                 sh "echo ${buildNumber}"
-                sh "./gradlew clean assemble -PbuildNumber=${buildNumber}"
+                sh "./gradlew clean assemble -PbuildNumber=${buildNumber} -Dorg.gradle.java.home=/usr/local/jdk-14.0.1"
             }
         }
         stage('imaging') {
             steps {
-                sh "docker build . -t ${registry}/${name}:${buildNumber}"
+                sh "docker buildx build --platform=linux/arm/v8 . -t ${registry}/${name}:${buildNumber} --load"
                 sh "docker push ${registry}/${name}"
             }
         }
@@ -39,7 +39,6 @@ pipeline {
                 sh "docker service rm ${name} || true"
                 sh "docker service create \
                     --name ${name} \
-                    --no-resolve-image \
                     --publish ${port} \
                     ${registry}/${name}:${buildNumber}"
             }
