@@ -25,12 +25,12 @@ pipeline {
             steps {
                 sh 'chmod +x gradlew'
                 sh "echo ${buildNumber}"
-                sh "./gradlew clean assemble -PbuildNumber=${buildNumber} -Dorg.gradle.java.home=/usr/local/jdk-14.0.1"
+                sh "./gradlew clean assemble -PbuildNumber=${buildNumber} -Dorg.gradle.java.home=/usr/local/jdk-11.0.2"
             }
         }
         stage('imaging') {
             steps {
-                sh "docker buildx build --platform=linux/arm/v8 . -t ${registry}/${name}:${buildNumber} --load"
+                sh "docker buildx build --platform=linux/arm64/v8 . -t ${registry}/${name}:${buildNumber} --load"
                 sh "docker push ${registry}/${name}"
             }
         }
@@ -41,6 +41,11 @@ pipeline {
                     --name ${name} \
                     --publish ${port} \
                     ${registry}/${name}:${buildNumber}"
+            }
+        }
+        stage('clean up') {
+            steps {
+                sh "docker image prune --all -f"
             }
         }
     }
